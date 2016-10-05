@@ -11,72 +11,62 @@ struct Node {
 	int value;
 	struct Node *next;
 	struct Node *prev;
+
+	Node(int x) {
+		value = x;
+		next = prev = NULL;
+	}
 } *start;
 
 class DoublyLinkedList {
 private:
 	Node *head;
+	Node *tail;
 	int length;
 
 public:
 	DoublyLinkedList() {
-		head = new Node;
-		head->next = head->prev = head;
-		head->value = 0;
-		length = 1;
+		head = NULL;
+		tail = NULL;
+		length = 0;
 	}
 	// insert the value at the rear of the list
 	void push_back(int x);
-	void push_back_2(int x);
 	void pop_back();
 	void push_front(int x);
 	void pop_front();
-	void print();
-	void print_reversely();
+	void print_all();
+	void print_all_reversely();
+	void print_at_position(int position);
 	int count();
-	Node* getTailNode();
-	bool isEmpty();
-	bool isEmpty_2();
-	bool isLastNode(Node* node);
 };
 
 void DoublyLinkedList::push_back(int x) {
-	Node *newNode = new Node;
-	Node* tailNode = getTailNode();
-	newNode->value = x;
-	newNode->next = NULL;
+	Node *newNode = new Node(x);
+
 	if (length == 0) {
-		head = newNode;
+		head = tail = newNode;
 	}
 	else {
-		newNode->prev = tailNode;
-		tailNode->next = newNode;
-		length++;
+		newNode->prev = tail;
+		tail->next = newNode;
+		tail = newNode;
 	}
+	length++;
 }
 
 void DoublyLinkedList::pop_back() {
 	if (length > 0)
 	{
-		Node* lastNode = getTailNode();
-		lastNode->prev->next = NULL;
-		free(lastNode);
+		Node* pLastNode = tail;
+		tail = tail->prev;
+		pLastNode->prev->next = NULL;
+		free(pLastNode);
 	};
 }
 
-void DoublyLinkedList::push_back_2(int x)
-{
-	Node *newNode = new Node;
-	newNode->value = x;
-	newNode->next = head;
-	newNode->prev = head->prev;
-	newNode->next->prev = newNode;
-	newNode->prev->next = newNode;
-	length++;
-}
-
 void DoublyLinkedList::push_front(int x) {
-	Node* newNode = new Node;
+	Node* newNode = new Node(x);
 	newNode->value = x;
 	newNode->next = head;
 	head = newNode;
@@ -84,70 +74,58 @@ void DoublyLinkedList::push_front(int x) {
 }
 
 void DoublyLinkedList::pop_front() {
-	// what happened if head==NULL
-	head = (head->next);
-	// how to deal with the old head
-	length--;
-}
-
-bool DoublyLinkedList::isEmpty() {
-	if (head == NULL)
-	{
-		cout << "The DoublyLinked List is empty" << endl;
-		return true;
+	if (length > 0) {
+		Node* oldHead = head;
+		head = (head->next);
+		free(oldHead);
+		length--;
 	}
-	else {
-		cout << "The Doubly Linked List is not empty" << endl;
-		return false;
-	}
-}
-
-bool DoublyLinkedList::isEmpty_2() {
-	return head->next == head;
 }
 
 int DoublyLinkedList::count() {
 	return length;
 }
 
-Node* DoublyLinkedList::getTailNode() {
-	Node* temp = head;
-	if (length == 0)  return NULL;
-	while (!isLastNode(temp))
-		temp = temp->next;
-	return temp;
-}
-
-bool DoublyLinkedList::isLastNode(Node* node) {
-	if (node->next == NULL) return true;
-	else return false;
-}
-
-void DoublyLinkedList::print() {
+void DoublyLinkedList::print_all() {
+	cout << "Print all elements" << endl;
 	if (length > 0) {
 		Node* cur = head;
-		if (!isLastNode(cur)) {
+		while (cur) {
 			cout << cur->value << endl;
-			cur->next = cur->next->next;
-		}
-		else {
-			cout << cur->value << endl;
+			cur = cur->next;
 		}
 	}
 	else {
-		cout << "Empty Doubly Linked List";
+		cout << "Empty Doubly Linked List" << endl;
 	}
+	cout << "#######" << endl;
 }
 
-void DoublyLinkedList::print_reversely() {
+void DoublyLinkedList::print_all_reversely() {
+	cout << "Print all elements reversely" << endl;
 	if (length > 0) {
-		Node* cur = getTailNode();
-		while (cur->prev != NULL) {
+		Node* cur = tail;
+		while (cur != NULL) {
 			cout << cur->value << endl;
+			cur = cur->prev;
 		}
 	}
 	else {
 		cout << "Empty Doubly Linked List";
+	}
+	cout << "*******" << endl;
+}
+
+void DoublyLinkedList::print_at_position(int position) {
+	Node* cur = head;
+	if (length < position) {
+		throw out_of_range("Position is out of bound of this Doubly Linked List.");
+	}
+	else {
+		for (int i = 0; i < position; i++) {
+			cur = cur->next;
+		}
+		cout << cur->value << endl;
 	}
 }
 
@@ -156,8 +134,32 @@ int main()
 {
 	DoublyLinkedList doublyLinkedList;
 
-	doublyLinkedList.push_back_2(7);
-	doublyLinkedList.print();
+	doublyLinkedList.push_back(1);
+	doublyLinkedList.push_back(2);
+	doublyLinkedList.push_back(3);
+	doublyLinkedList.push_back(4);
+	doublyLinkedList.push_back(5);
+	doublyLinkedList.push_back(6);
+	doublyLinkedList.push_back(7);
+
+	cout << "Length of DoublyLinkedList: " << doublyLinkedList.count() << endl;
+
+	for (int i = 0; i < doublyLinkedList.count(); i++) {
+		cout << "Position " << i << ": ";
+		doublyLinkedList.print_at_position(i);
+	}
+
+	doublyLinkedList.print_all();
+	doublyLinkedList.print_all_reversely();
+
+	doublyLinkedList.pop_back();
+	doublyLinkedList.print_all();
+
+	doublyLinkedList.push_front(0);
+	doublyLinkedList.print_all();
+
+	doublyLinkedList.pop_front();
+	doublyLinkedList.print_all();
 
 
 	getchar();
