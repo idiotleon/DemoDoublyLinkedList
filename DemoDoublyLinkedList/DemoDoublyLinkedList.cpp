@@ -32,9 +32,9 @@ public:
 	}
 	// insert the value at the rear of the list
 	void push_back(int x);
-	void pop_back();
+	int pop_back();
 	void push_front(int x);
-	void pop_front();
+	int pop_front();
 	void print_all();
 	void print_all_reversely();
 	void print_at_position(int position);
@@ -55,30 +55,46 @@ void DoublyLinkedList::push_back(int x) {
 	length++;
 }
 
-void DoublyLinkedList::pop_back() {
+int DoublyLinkedList::pop_back() {
 	if (length > 0)
 	{
-		Node* pLastNode = tail;
+		Node* oldTail = tail;
 		tail = tail->prev;
-		pLastNode->prev->next = NULL;
-		free(pLastNode);
+		int value = oldTail->value;
+		tail->next = NULL;
+		free(oldTail);
+		length--;
+		if (length == 1) head->next = NULL;
+		return value;
 	};
 }
 
 void DoublyLinkedList::push_front(int x) {
 	Node* newNode = new Node(x);
-	newNode->value = x;
-	newNode->next = head;
-	head = newNode;
+	if (length == 0) {
+		head = tail = newNode;
+	}
+	else {
+		newNode->next = head;
+		head->prev = newNode;
+		head = newNode;
+	}
 	length++;
 }
 
-void DoublyLinkedList::pop_front() {
+int DoublyLinkedList::pop_front() {
 	if (length > 0) {
 		Node* oldHead = head;
+		int value = oldHead->value;
 		head = (head->next);
+		head->prev = NULL;
 		free(oldHead);
 		length--;
+		if (length == 1) tail->prev = NULL;
+		return value;
+	}
+	else {
+		throw out_of_range("There is no element on this Doubly Linked List.");
 	}
 }
 
@@ -118,7 +134,7 @@ void DoublyLinkedList::print_all_reversely() {
 
 void DoublyLinkedList::print_at_position(int position) {
 	Node* cur = head;
-	if (length < position) {
+	if (length <= position) {
 		throw out_of_range("Position is out of bound of this Doubly Linked List.");
 	}
 	else {
@@ -144,23 +160,34 @@ int main()
 
 	cout << "Length of DoublyLinkedList: " << doublyLinkedList.count() << endl;
 
+	cout << "Method: print_at_position(int position)" << endl;
 	for (int i = 0; i < doublyLinkedList.count(); i++) {
 		cout << "Position " << i << ": ";
 		doublyLinkedList.print_at_position(i);
 	}
+	cout << endl;
 
+	cout << "Method: print_all()" << endl;
 	doublyLinkedList.print_all();
+	cout << endl;
+	cout << "Method: print_all_revesely()" << endl;
 	doublyLinkedList.print_all_reversely();
+	cout << endl;
 
-	doublyLinkedList.pop_back();
+	cout << "Method: pop_back()" << endl;
+	cout << doublyLinkedList.pop_back() << endl;
 	doublyLinkedList.print_all();
+	cout << endl;
 
+	cout << "Method: push_front(0)" << endl;
 	doublyLinkedList.push_front(0);
 	doublyLinkedList.print_all();
+	cout << endl;
 
-	doublyLinkedList.pop_front();
+	cout << "Method: pop_front()" << endl;
+	cout << doublyLinkedList.pop_front() << endl;
 	doublyLinkedList.print_all();
-
+	cout << endl;
 
 	getchar();
 	return 0;
